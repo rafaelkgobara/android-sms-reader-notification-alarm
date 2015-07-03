@@ -1,7 +1,5 @@
 package com.rafaelgobara.smsreader.services;
 
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -13,7 +11,6 @@ import android.telephony.SmsMessage;
 import android.util.Log;
 
 import com.rafaelgobara.smsreader.FullscreenActivity;
-import com.rafaelgobara.smsreader.MainActivity;
 import com.rafaelgobara.smsreader.R;
 import com.rafaelgobara.smsreader.constants.Constants;
 /**
@@ -42,6 +39,8 @@ public class SmsReceiver extends BroadcastReceiver
 			// For every SMS message received
 			for (int i = 0; i < msgs.length; i++)
 			{
+				// TODO Verifiy if the SMS is that what you want.
+
 				// Convert Object array
 				msgs[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
 				// Sender's phone number
@@ -51,9 +50,6 @@ public class SmsReceiver extends BroadcastReceiver
 				// Newline <img src="http://codetheory.in/wp-includes/images/smilies/simple-smile.png" alt=":-)" class="wp-smiley" style="height: 1em; max-height: 1em;">
 				str += "\n";
 			}
-
-			// Display the entire SMS Message
-			Log.d(TAG, str);
 
 			int notificationId = (int) (System.currentTimeMillis() / 1000L);
 
@@ -68,16 +64,26 @@ public class SmsReceiver extends BroadcastReceiver
 			builder.setSmallIcon(R.drawable.ic_stat_name);
 			builder.setContentTitle("Opa");
 			builder.setContentText(str);
-			builder.setFullScreenIntent(resultPendingIntent, true);
-			builder.setPriority(NotificationCompat.PRIORITY_MAX);
-			builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-			builder.setCategory(NotificationCompat.CATEGORY_ALARM);
-			builder.setAutoCancel(true);
 			builder.setContentIntent(resultPendingIntent);
+
+			// Automatically launch the activity.
+			builder.setFullScreenIntent(resultPendingIntent, true);
+
+			// High priority.
+			builder.setPriority(NotificationCompat.PRIORITY_MAX);
+
+			// Public visibility means that the notification will appear even with screen locked.
+			builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+
+			// Setting a category for notification.
+			builder.setCategory(NotificationCompat.CATEGORY_ALARM);
+
+			// Keep the notification alive until you manually dismiss it.
 			builder.setOngoing(true);
 
 			// Gets an instance of the NotificationManager service
 			final NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+
 			// Builds the notification and issues it.
 			notificationManager.notify(notificationId, builder.build());
 		}
